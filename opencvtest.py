@@ -38,7 +38,12 @@ while True:
         else:
             cv2.drawContours(output, contours, i, (0, 255, 0), 3)
 
+    # Now we will draw a black frame around the edges because the black contours above
+    # don't go all the way to the edge of the image
+    height, width = tracker.shape
+    cv2.rectangle(tracker, (0, 0), (width, height), (0, 0, 0), 2)
 
+    cv2.imshow('tracker', tracker)
     # Calculate moments
     moments = cv2.moments(tracker)
     dm01 = moments['m01']
@@ -58,7 +63,6 @@ while True:
 
     # Display the resulting frame
     cv2.imshow('hsv', hsv)
-    cv2.imshow('mask', mask)
     cv2.imshow('output', output)
     if cv2.waitKey(1) & 0xFF == ord('q'):
         break
