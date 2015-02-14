@@ -1,3 +1,4 @@
+#!/usr/env python
 import numpy as np
 import cv2
 
@@ -5,10 +6,7 @@ cap = cv2.VideoCapture(0)
 # Die in a fire autoexposure
 cap.set(15, 1)
 
-lastx = -1
-lasty = -1
-
-while True:
+for i in range(200):
     # Capture frame-by-frame
     _, frame = cap.read()
 
@@ -43,7 +41,8 @@ while True:
     height, width = tracker.shape
     cv2.rectangle(tracker, (0, 0), (width, height), (0, 0, 0), 2)
 
-    cv2.imshow('tracker', tracker)
+    #cv2.imshow('tracker', tracker)
+    #cv2.moveWindow('tracker',0,0)
     # Calculate moments
     moments = cv2.moments(tracker)
     dm01 = moments['m01']
@@ -62,8 +61,10 @@ while True:
         cv2.circle(output, (posx, posy), 5, (25, 200, 50), 10)
 
     # Display the resulting frame
-    cv2.imshow('hsv', hsv)
-    cv2.imshow('output', output)
+    #cv2.imshow('hsv', hsv)
+    #cv2.moveWindow('hsv',600,0)
+    #cv2.imshow('output', output)
+    #cv2.moveWindow('output',600,600)
     if cv2.waitKey(1) & 0xFF == ord('q'):
         break
 
