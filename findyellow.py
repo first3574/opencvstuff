@@ -16,8 +16,6 @@ def save_color_values(hl, sl, vl, hh, sh, vh):
 
 
 def get_yellow_frame(cap, lowvals, highvals):
-
-    # Capture frame-by-frame
     _, frame = cap.read()
 
     # Our operations on the frame come here
@@ -30,3 +28,12 @@ def get_yellow_frame(cap, lowvals, highvals):
     mask = cv2.inRange(hsv, lower_yellow, upper_yellow)
 
     return mask 
+
+if __name__ == "__main__":
+    cap = cv2.VideoCapture(0)
+    lowvals, highvals = read_color_values()
+    print(lowvals)
+    print(highvals)
+    mask = get_yellow_frame(cap, lowvals, highvals)
+    cv2.imwrite("static/tempcalibrate.png", mask )
+
