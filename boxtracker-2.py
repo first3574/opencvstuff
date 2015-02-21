@@ -1,9 +1,13 @@
 import numpy as np
 import cv2
+import nt_client
 
 cap = cv2.VideoCapture(0)
 # Die in a fire autoexposure
 cap.set(15, 1)
+
+client = nt_client.NetworkTableClient("3574")
+client.setValue("/Vision/Test", "howdy")
 
 lastx = -1
 lasty = -1
@@ -66,6 +70,8 @@ while True:
     cv2.imshow('output', output)
     if cv2.waitKey(1) & 0xFF == ord('q'):
         break
+
+#client.setValue("/Vision/Vertical_And_Horizontal_Close", verAndHorClose)
 
 # When everything done, release the capture
 cap.release()
