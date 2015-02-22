@@ -7,7 +7,7 @@ cap = cv2.VideoCapture(0)
 cap.set(15, 1)
 
 client = nt_client.NetworkTableClient("3574")
-client.setValue("/Vision/Test", "howdy")
+client.setValue("/Vision", "howdy")
 
 lastx = -1
 lasty = -1
@@ -71,7 +71,8 @@ while True:
     if cv2.waitKey(1) & 0xFF == ord('q'):
         break
 
-#client.setValue("/Vision/Vertical_And_Horizontal_Close", verAndHorClose)
+client.setValue("/Vision/Position X", posx)
+client.setValue("/Vision/Position Y", posy)
 
 # When everything done, release the capture
 cap.release()
