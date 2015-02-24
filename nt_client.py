@@ -6,11 +6,10 @@ Simple implementation of the NetworkTables2 protocol for client
 """
 
 import socket
-import sys
-import select
 import struct
 import time
 import thread
+
 
 class EntryValue:
     def __init__(self, name, entryId, seqId, value):
@@ -29,6 +28,7 @@ class EntryValue:
 
     def __repr__(self):
         return str((self.name, self.entryId, self.seqId, self.value))
+
 
 class NetworkTableClient(object):
     def __init__(self, team):
@@ -58,11 +58,11 @@ class NetworkTableClient(object):
         time.sleep(0.5)
 
     def getNumFromBytes(self, b):
-        return (b[0] * 2**8) + b[1]
+        return (b[0] * 2 ** 8) + b[1]
 
     def interpretEntry(self, data):
         nameLen = self.getNumFromBytes(data[0:2])
-        name = str(data[2:nameLen+2])
+        name = str(data[2:nameLen + 2])
         data = data[(nameLen + 2):]
 
         t = data[0]
@@ -86,7 +86,7 @@ class NetworkTableClient(object):
         elif t == 2:
             """String"""
             strLen = self.getNumFromBytes(data[0:2])
-            strValue = str(data[2:strLen+2])
+            strValue = str(data[2:strLen + 2])
             self.tableValues[entryId] = EntryValue(name, entryId, seq, strValue)
             self.entryIdByName[name] = entryId
             return data[strLen + 2:]
@@ -99,14 +99,17 @@ class NetworkTableClient(object):
         if not self.entryIdByName.has_key(name):
             entry = EntryValue(name, 0xFFFF, 0x0, value)
             if entry.getType() == bool:
-                updateMessage = "\x10" + struct.pack("!H" + str(len(name)) + "sBHH?", len(name), name, 0x00, entry.entryId, entry.seqId, entry.value);
+                updateMessage = "\x10" + struct.pack("!H" + str(len(name)) + "sBHH?", len(name), name, 0x00,
+                                                     entry.entryId, entry.seqId, entry.value)
 
             elif entry.getType() == float:
-                updateMessage = "\x10" + struct.pack("!H" + str(len(name)) + "sBHHd", len(name), name, 0x01, entry.entryId, entry.seqId, entry.value);
+                updateMessage = "\x10" + struct.pack("!H" + str(len(name)) + "sBHHd", len(name), name, 0x01,
+                                                     entry.entryId, entry.seqId, entry.value)
 
             elif entry.getType() == str:
                 strLen = len(value)
-                updateMessage = "\x10" + struct.pack("!H" + str(len(name)) + "sBHHH" + str(strLen) + "s", len(name), name, 0x02, entry.entryId, entry.seqId, strLen, entry.value);
+                updateMessage = "\x10" + struct.pack("!H" + str(len(name)) + "sBHHH" + str(strLen) + "s", len(name),
+                                                     name, 0x02, entry.entryId, entry.seqId, strLen, entry.value)
             else:
                 updateMessage = ""
 
@@ -119,16 +122,17 @@ class NetworkTableClient(object):
 
             if entry.getType() == bool:
                 entry.update(value, entry.seqId + 1)
-                updateMessage = "\x11" + struct.pack("!HH?", entry.entryId, entry.seqId, entry.value);
+                updateMessage = "\x11" + struct.pack("!HH?", entry.entryId, entry.seqId, entry.value)
 
             elif entry.getType() == float:
                 entry.update(value, entry.seqId + 1)
-                updateMessage = "\x11" + struct.pack("!HHd", entry.entryId, entry.seqId, entry.value);
+                updateMessage = "\x11" + struct.pack("!HHd", entry.entryId, entry.seqId, entry.value)
 
             elif entry.getType() == str:
                 strLen = len(value)
                 entry.update(value, entry.seqId + 1)
-                updateMessage = "\x11" + struct.pack("!HHH" + str(strLen) + "s", entry.entryId, entry.seqId, strLen, entry.value);
+                updateMessage = "\x11" + struct.pack("!HHH" + str(strLen) + "s", entry.entryId, entry.seqId, strLen,
+                                                     entry.value)
 
         self.sendLock.acquire()
         self.sock.send(updateMessage)
@@ -161,7 +165,7 @@ class NetworkTableClient(object):
         elif entry.getType() == str:
             """String"""
             strLen = self.getNumFromBytes(data[0:2])
-            entry.update(str(data[2:strLen+2]), seq)
+            entry.update(str(data[2:strLen + 2]), seq)
             return data[strLen + 2:]
 
     def sayHello(self):
@@ -202,14 +206,14 @@ class NetworkTableClient(object):
             # Give some time to make sure we get all the message from the server
             time.sleep(0.05)
 
+
 if __name__ == "__main__":
     import sys
 
-    if len(sys.argv)<1:
+    if len(sys.argv) < 1:
         sys.exit('Usage: %s team number' % sys.argv[0])
 
     client = NetworkTableClient(sys.argv[1])
-
 
     client.setValue("howdy", 2000.0)
     client.setValue("/what/is/up", "Cool!")
