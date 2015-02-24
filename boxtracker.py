@@ -48,6 +48,7 @@ while True:
     # Now we will draw a black frame around the edges because the black contours above
     # don't go all the way to the edge of the image
     height, width = tracker.shape
+    center_x = width/2
     cv2.rectangle(tracker, (0, 0), (width, height), (0, 0, 0), 2)
 
     # cv2.imshow('tracker', tracker)
@@ -77,10 +78,14 @@ while True:
     if cv2.waitKey(1) & 0xFF == ord('q'):
         break
 
+    # Calculate distance from the center (left side is negative)
+    distance_from_center = -(center_x - posx)
+
     # stops errors if can't connect to the network tables
     if client is not None:
         client.setValue("/Vision/Position X", posx)
         client.setValue("/Vision/Position Y", posy)
+        client.setValue("/Vision/Distance From Center", distance_from_center)
 
 # When everything done, release the capture
 cap.release()
