@@ -32,11 +32,8 @@ class EntryValue:
 
 class NetworkTableClient(object):
     def __init__(self, team):
-        teamPad = team.rjust(5, '0')
-        c1 = int(teamPad[0:3])
-        c2 = int(teamPad[3:5])
         self.port = 1735
-        self.host = "10.{0}.{1}.2".format(c1, c2)
+        self.host = "roborio-{}.local".format(team)
         self.tableValues = dict()
         self.entryIdByName = dict()
         self.watches = dict()
@@ -46,6 +43,7 @@ class NetworkTableClient(object):
 
         # Connect to server at port
         self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        print("Trying to connect to {}:{}".format(self.host, self.port))
         self.sock.connect((self.host, self.port))
         print 'Connected to NetworkTables server@%d' % self.port
 
@@ -95,6 +93,9 @@ class NetworkTableClient(object):
         self.watches[name] = func
 
     def setValue(self, name, value):
+        # Just cast ints to floats
+        if type(value) == int:
+            value = float(value)
 
         if not self.entryIdByName.has_key(name):
             entry = EntryValue(name, 0xFFFF, 0x0, value)

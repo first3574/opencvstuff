@@ -58,6 +58,8 @@ while True:
     dm10 = moments['m10']
     darea = moments['m00']
 
+    posx = -1
+    posy = -1
     if darea > 20000:
         allpoints = cv2.findNonZero(tracker)
         bounding_rect = cv2.minAreaRect(allpoints)
@@ -76,7 +78,7 @@ while True:
         break
 
     # stops errors if can't connect to the network tables
-    if client:
+    if client is not None:
         client.setValue("/Vision/Position X", posx)
         client.setValue("/Vision/Position Y", posy)
 
