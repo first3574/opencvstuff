@@ -45,23 +45,17 @@ class NetworkTableClient(object):
         self.sendLock = thread.allocate_lock()
 
         # Connect to server at port
-        try:
-            self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-            self.sock.connect((self.host, self.port))
-            print 'Connected to NetworkTables server@%d' % self.port
+        self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        self.sock.connect((self.host, self.port))
+        print 'Connected to NetworkTables server@%d' % self.port
 
-            # Hello message
-            self.sayHello()
-            time.sleep(0.1)
-            thread.start_new_thread(self.valueReciever, ())
-            thread.start_new_thread(self.keepAlive, ())
-            # Hacky way to give the initial value load time to process
-            time.sleep(0.5)
-
-        except socket.error, e:
-            print e
-            print 'Could not connect to chat server @%d' % self.port
-            sys.exit(1)
+        # Hello message
+        self.sayHello()
+        time.sleep(0.1)
+        thread.start_new_thread(self.valueReciever, ())
+        thread.start_new_thread(self.keepAlive, ())
+        # Hacky way to give the initial value load time to process
+        time.sleep(0.5)
 
     def getNumFromBytes(self, b):
         return (b[0] * 2**8) + b[1]

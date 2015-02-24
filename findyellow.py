@@ -1,7 +1,7 @@
 #!/usr/env python
 import numpy as np
 import cv2
-import time
+
 
 def read_color_values():
     with open('static/colorvalues') as cvf:
@@ -27,7 +27,8 @@ def get_yellow_frame(cap, lowvals, highvals):
     # Threshold the HSV image to get only yellow colors
     mask = cv2.inRange(hsv, lower_yellow, upper_yellow)
 
-    return mask 
+    return mask
+
 
 if __name__ == "__main__":
     cap = cv2.VideoCapture(0)
@@ -35,5 +36,5 @@ if __name__ == "__main__":
     print(lowvals)
     print(highvals)
     mask = get_yellow_frame(cap, lowvals, highvals)
-    cv2.imwrite("static/tempcalibrate.png", mask )
+    cv2.imwrite("static/tempcalibrate.png", mask)
 

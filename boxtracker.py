@@ -1,29 +1,38 @@
 #!/usr/env python
 import numpy as np
 import cv2
+import nt_client
+import findyellow
 
 cap = cv2.VideoCapture(0)
 # Die in a fire autoexposure
 cap.set(15, 1)
 
-for i in range(200):
+client = None
+try:
+    client = nt_client.NetworkTableClient("3574")
+    client.setValue("/Vision", "howdy")
+except Exception:
+    print "Couldn't connect to network table 3574."
+
+# yellow color range, obtained from config file
+lower_yellow, upper_yellow = map(np.array, findyellow.read_color_values())
+
+while True:
     # Capture frame-by-frame
     _, frame = cap.read()
 
     # Our operations on the frame come here
     hsv = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
 
-    # yellow color range
-    lower_yellow = np.array([20, 120, 120])
-    upper_yellow = np.array([30, 255, 255])
     # Threshold the HSV image to get only yellow colors
     mask = cv2.inRange(hsv, lower_yellow, upper_yellow)
 
     # Remove small objects & holes from foreground
     tracker = cv2.erode(mask, cv2.getStructuringElement(cv2.MORPH_ELLIPSE,
                                                         (10, 10)))
-    tracker = cv2.dilate(mask, cv2.getStructuringElement(cv2.MORPH_ELLIPSE,
-                                                         (5, 5)))
+    tracker = cv2.dilate(tracker, cv2.getStructuringElement(cv2.MORPH_ELLIPSE,
+                                                            (5, 5)))
 
     # Go back to color mode so we can see the line in color
     output = cv2.cvtColor(tracker, cv2.COLOR_GRAY2BGR)
@@ -41,8 +50,8 @@ for i in range(200):
     height, width = tracker.shape
     cv2.rectangle(tracker, (0, 0), (width, height), (0, 0, 0), 2)
 
-    #cv2.imshow('tracker', tracker)
-    #cv2.moveWindow('tracker',0,0)
+    # cv2.imshow('tracker', tracker)
+    # cv2.moveWindow('tracker',0,0)
     # Calculate moments
     moments = cv2.moments(tracker)
     dm01 = moments['m01']
@@ -61,12 +70,15 @@ for i in range(200):
         cv2.circle(output, (posx, posy), 5, (25, 200, 50), 10)
 
     # Display the resulting frame
-    #cv2.imshow('hsv', hsv)
-    #cv2.moveWindow('hsv',600,0)
-    #cv2.imshow('output', output)
-    #cv2.moveWindow('output',600,600)
+    cv2.imshow('hsv', hsv)
+    cv2.imshow('output', output)
     if cv2.waitKey(1) & 0xFF == ord('q'):
         break
+
+    # stops errors if can't connect to the network tables
+    if client:
+        client.setValue("/Vision/Position X", posx)
+        client.setValue("/Vision/Position Y", posy)
 
 # When everything done, release the capture
 cap.release()
