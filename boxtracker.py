@@ -17,6 +17,7 @@ except Exception:
 
 # yellow color range, obtained from config file
 lower_yellow, upper_yellow = map(np.array, findyellow.read_color_values())
+print("Yellow bounds:\n{}\n{}".format(lower_yellow, upper_yellow))
 
 while True:
     # Capture frame-by-frame
@@ -30,7 +31,7 @@ while True:
 
     # Remove small objects & holes from foreground
     tracker = cv2.erode(mask, cv2.getStructuringElement(cv2.MORPH_ELLIPSE,
-                                                        (10, 10)))
+                                                        (15, 15)))
     tracker = cv2.dilate(tracker, cv2.getStructuringElement(cv2.MORPH_ELLIPSE,
                                                             (5, 5)))
 
@@ -73,7 +74,7 @@ while True:
         cv2.circle(output, (posx, posy), 5, (25, 200, 50), 10)
 
     # Display the resulting frame
-    cv2.imshow('hsv', hsv)
+    cv2.imshow('original', frame)
     cv2.imshow('output', output)
     if cv2.waitKey(1) & 0xFF == ord('q'):
         break
