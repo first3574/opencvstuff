@@ -7,6 +7,8 @@ import findyellow
 cap = cv2.VideoCapture(0)
 # Die in a fire autoexposure
 cap.set(15, 1)
+cap.set(3, 1080)
+cap.set(4, 480)
 
 client = None
 try:
