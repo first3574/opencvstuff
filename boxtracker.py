@@ -1,4 +1,4 @@
-#!/usr/env python
+#!/usr/bin/env python
 import numpy as np
 import cv2
 import nt_client
@@ -7,8 +7,6 @@ import findyellow
 cap = cv2.VideoCapture(0)
 # Die in a fire autoexposure
 cap.set(15, 1)
-cap.set(3, 1080)
-cap.set(4, 480)
 
 client = None
 try:
@@ -76,8 +74,8 @@ while True:
         cv2.circle(output, (posx, posy), 5, (25, 200, 50), 10)
 
     # Display the resulting frame
-    cv2.imshow('original', frame)
-    cv2.imshow('output', output)
+    #cv2.imshow('original', frame)
+    #cv2.imshow('output', output)
     if cv2.waitKey(1) & 0xFF == ord('q'):
         break
 
